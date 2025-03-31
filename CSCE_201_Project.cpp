@@ -84,8 +84,8 @@ int getAnswer()
 
 void playGame() {
 	cout << "game working" << endl;
-	int LENGTH = 10;
-	int WIDTH = 10;
+	const int LENGTH = 10;
+	const int WIDTH = 10;
 	int map[LENGTH][WIDTH] = 0; //most of the game will be handled within an array
 	//basic game loop:
 	//1. check if a fruit has been eaten, and update length if it has
