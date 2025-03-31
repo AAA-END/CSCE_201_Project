@@ -86,7 +86,7 @@ void playGame() {
 	cout << "game working" << endl;
 	const int LENGTH = 10;
 	const int WIDTH = 10;
-	int map[LENGTH][WIDTH] = 0; //most of the game will be handled within an array
+	int map[LENGTH][WIDTH] = {0}; //most of the game will be handled within an array
 	//basic game loop:
 	//1. check if a fruit has been eaten, and update length if it has
 	//2. check if the user has input a direction, update direction if they did (this may be difficult with only iostream, so other libraries may be needed)
