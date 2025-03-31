@@ -88,4 +88,5 @@ void playGame() {
 
 int setSpeed() {
 	cout << "menu working" << endl;
+	return 20;
 }
