@@ -1,7 +1,9 @@
 #include <iostream>
+#include <string>
 #include <cstdlib> //for rand() 
 #include <ctime> // for time
 #include <conio.h> //input handling
+#include <fstream> //scoreboard management
 
 #define KEY_UP    72 
 #define KEY_LEFT  75
@@ -18,6 +20,8 @@ int getAnswer();
 
 int setSpeed();
 
+void trackScores();
+
 void playGame();
 
 
@@ -28,7 +32,7 @@ int main()
 	int menu_mode = 0;
 	int game_speed = 20;
 
-	while (menu_mode != 3) {
+	while (menu_mode != 4) {
 		showMenu();
 		menu_mode = getAnswer();
 
@@ -37,6 +41,9 @@ int main()
 		}
 		else if (menu_mode == 2) {
 			game_speed = setSpeed();
+		}
+		else if (menu_mode == 3) {
+			trackScores();
 		}
 	}
 }
@@ -73,18 +80,19 @@ void showMenu()
 {
 	cout << "1. Play game\n";
 	cout << "2. Adjust settings\n";
-	cout << "3. Exit game\n";
+	cout << "3. Score history\n";
+	cout << "4. Exit game\n";
 }
 
 int getAnswer()
 {
 	int menu_answer = 0;
 	char input_answer[9];
-	while ((menu_answer > 3) || (menu_answer < 1)) {
+	while ((menu_answer > 4) || (menu_answer < 1)) {
 		cout << "\nEnter an input number: ";
 		cin >> input_answer;
 		menu_answer = intCheck(input_answer);
-		if ((menu_answer > 3) || (menu_answer < 1))
+		if ((menu_answer > 4) || (menu_answer < 1))
 			cout << "Error: input number out of range";
 	}
 	return menu_answer;
@@ -138,10 +146,10 @@ void playGame() {
 	test = true;
 	//basic game loop:
 	//1. check if the user has input a direction, update direction if they did
-	input = getch();
+	input = _getch();
 	while(test == true){
 	if (!(input && input != 224))
-	switch(ex = getch())
+	switch(ex = _getch())
 	{
 		case KEY_UP     /* H */:
 			if (playerDirection != 3)
@@ -230,6 +238,33 @@ void playGame() {
 }
 
 int setSpeed() {
-	cout << "menu working" << endl;
-	return 20;
+	cout << "Enter your speed value (default = 20): ";
+
+	char inp_num[9];
+	cin >> inp_num;
+	int speed_num = intCheck(inp_num);
+	cout << endl;
+	return speed_num;
+}
+
+void trackScores() {
+	cout << endl;
+	ifstream scoreFile;
+	scoreFile.open("Scores.txt");
+
+	cout << "Score history: \n-------------------------------------------\n";
+
+	if (!scoreFile.fail()) {
+		while (true) {
+			string line;
+			getline(scoreFile, line);
+			if (scoreFile.fail())
+				break;
+			cout << line << endl;
+		}
+	}
+	else
+		cout << "Error: could not open score file";
+	scoreFile.close();
+	cout << endl;
 }
