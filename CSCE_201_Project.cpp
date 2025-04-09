@@ -40,7 +40,7 @@ int main()
 			playGame();
 		}
 		else if (menu_mode == 2) {
-			game_speed = setSpeed();
+			game_speed = setSpeed(); //we could add a setting to let user adjust the width of the map display
 		}
 		else if (menu_mode == 3) {
 			trackScores();
@@ -103,39 +103,41 @@ void playGame() {
 	int input, ex;
 	int randa = 0;
 	int randb = 0;
+	int ruler = 0;
 	const int LENGTH = 10;
 	const int WIDTH = 10;
 	int playerLength = 1;
 	bool life = true;
 	bool test = true;
 	bool win = false;
+	bool eatFruit = false;
 	int playerDirection = 2; //1 = north (check map[x-1][x]), 2 = east (check map[x][x+1]), 3 = south (check map[x+1][x]), 4 = west (check map[x][x - 1])
 	int map[LENGTH + 2][WIDTH + 2] = {0}; //most of the game will be handled within an array
 
-	//populate borders with 2 (1 is fruit, 2 is wall, 3 is body, 4 is tail, 5 is head)
+	//populate borders with -2
 	for (int i = 0; i < LENGTH + 2; i++)
 		for (int j = 0; j < WIDTH + 2; j++){
 			if (i == 0)
-				map[i][j] = 2;
+				map[i][j] = -2;
 			if (j == 0)
-				map[i][j] = 2;
+				map[i][j] = -2;
 			if (i == (LENGTH + 1))
-				map[i][j] = 2;
+				map[i][j] = -2;
 			if (j == (WIDTH + 1))
-				map[i][j] = 2;
+				map[i][j] = -2;
 			} 
 
 	//set position of head
-	map[5][5] = 5;
+	map[5][5] = 1;
 
 	//place first fruit
-	while (map[randa][randb] != 0){  //TODO: turn this thing into a function
+	while (map[randa][randb] != 0){ 
 	randa = rand() % 10 + 1;
 	randb = rand() % 10 + 1;
 	}
-	map[randa][randb] = 1;
+	map[randa][randb] = 1000;
 
-	for (int i = 0; i < LENGTH + 2; i++){
+	for (int i = 0; i < LENGTH + 2; i++){ //TODO: make a proper start screen
 		for (int j = 0; j < WIDTH + 2; j++){
 			cout << map[i][j];
 		}
@@ -145,95 +147,161 @@ void playGame() {
 	while (life == true){
 	test = true;
 	//basic game loop:
+
 	//1. check if the user has input a direction, update direction if they did
-	input = _getch();
-	while(test == true){
-	if (!(input && input != 224))
-	switch(ex = _getch())
-	{
-		case KEY_UP     /* H */:
-			if (playerDirection != 3)
-				playerDirection = 1;
-				test = false;
-			break;
-		case KEY_DOWN   /* K */:
-			if (playerDirection != 1)
-				playerDirection = 3;
-				test = false;
-			break;
-		case KEY_LEFT   /* M */:
-			if (playerDirection != 2)
-				playerDirection = 4;
-				test = false;
-			break;
-		case KEY_RIGHT: /* P */
-			if (playerDirection != 4)
-				playerDirection = 2;
-				test = false;
-			break;
+	//TODO: needs timer
+	clock_t tstart = clock();
+	while((clock() - tstart) / CLOCKS_PER_SEC < 1) {
+		if (kbhit()){
+			input = getch();
+			while(test == true){
+			if (!(input && input != 224))
+			switch(ex = getch())
+			{
+				case KEY_UP     /* H */:
+					if (playerDirection != 3)
+						playerDirection = 1;
+						test = false;
+					break;
+				case KEY_DOWN   /* K */:
+					if (playerDirection != 1)
+						playerDirection = 3;
+						test = false;
+					break;
+				case KEY_LEFT   /* M */:
+					if (playerDirection != 2)
+						playerDirection = 4;
+						test = false;
+					break;
+				case KEY_RIGHT: /* P */
+					if (playerDirection != 4)
+						playerDirection = 2;
+						test = false;
+					break;
+			}
+		}
 	}
 }
+
+
 	//2. move the snake forward
+	//move snake body
+	if (playerLength > 1){
+		for (int f = playerLength; f > 0; f--){
+			for (int i = 0; i < LENGTH + 2; i++)
+				for (int j = 0; j < WIDTH + 2; j++){
+					if (eatFruit == false){
+						if (map[i][j] == f){
+							if (f == playerLength)
+								map[i][j] = 0;
+							else
+								map[i][j] = map[i][j] + 1;
+						}
+					}
+					else
+						if (map[i][j] == f)
+							map[i][j] = map[i][j] + 1;
+				}
+		  //}
+		}
+	}
+	//move snake head
 	test = true;
 	for (int i = 0; i < LENGTH + 2; i++) //This can be made more efficient by not scanning border elements
 		for (int j = 0; j < WIDTH + 2; j++){
 			if (test == true){
-			if (map[i][j] == 5){
-				test = false;
-				if (playerDirection == 1){ //north
-					map[i-1][j] = 5 + map[i-1][j];
+				if (playerLength == 1){
+					if (map[i][j] == 1){
+						test = false;
+						if (playerDirection == 1){ //north
+							map[i-1][j] = 1 + map[i-1][j];
+						}
+						if (playerDirection == 2){ //east
+							map[i][j+1] = 1 + map[i][j+1];
+						}
+						if (playerDirection == 3){ //south
+							map[i+1][j] = 1 + map[i+1][j];
+						}
+						if (playerDirection == 4){ //west
+							map[i][j - 1] = 1 + map[i][j - 1];
+						}
+						map[i][j] = 0;
+					}
 				}
-				if (playerDirection == 2){ //east
-					map[i][j+1] = 5 + map[i][j+1];
+				else{
+					if (map[i][j] == 2){
+						test = false;
+						if (playerDirection == 1){ //north
+							map[i-1][j] = 1 + map[i-1][j];
+						}
+						if (playerDirection == 2){ //east
+							map[i][j+1] = 1 + map[i][j+1];
+						}
+						if (playerDirection == 3){ //south
+							map[i+1][j] = 1 + map[i+1][j];
+						}
+						if (playerDirection == 4){ //west
+							map[i][j - 1] = 1 + map[i][j - 1];
+						}
+					}
+
 				}
-				if (playerDirection == 3){ //south
-					map[i+1][j] = 5 + map[i+1][j];
-				}
-				if (playerDirection == 4){ //west
-					map[i][j - 1] = 5 + map[i][j - 1];
-				}
-				if (playerLength = 1) //TODO: turn this check into a function
-					map[i][j] = 0;
-				else if (playerLength = 2)
-					map[i][j] = 5;
-				else
-					map[i][j] = 3;
 			}
 		}
-		}
+
+
+	test = true;
+	eatFruit = false;
 	//3. check if a fruit has been eaten, update length and place a new fruit if it has (also checks other collision)
 	for (int i = 0; i < LENGTH + 2; i++)
 		for (int j = 0; j < WIDTH + 2; j++){
-			if (map[i][j] == 6){
-				map[i][j] = 5;
+			if (map[i][j] == 1001){
+				test = false;
+				eatFruit = true;
+				map[i][j] = 1;
 				playerLength++;
-				if (playerLength >= (LENGTH*WIDTH))
-					win = true;
+				if (playerLength >= (LENGTH*WIDTH)){
+					win = true; //TODO: victory screen
+					life = false; //you still die when you win though
+				}
 				else{
 				while (map[randa][randb] != 0){
 					randa = rand() % 10 + 1;
 					randb = rand() % 10 + 1;
 					}
-					map[randa][randb] = 1;
+					map[randa][randb] = 1000;
 				}
 			}
-			else if (map[i][j] >= 7){
-				life = false;
-				//need a function to handle dying
+			else if (map[i][j] == 1){
+				test = false;
 			}
 		}
+
+	// if the head isn't found, die. 
+	if (test == true)
+		life = false; //TODO: death screen
+
+
 	//4. update the drawing (clear it and then redraw it with the change above made)
-	for (int i = 0; i < LENGTH; i++)
+	for (int i = 0; i < LENGTH; i++) //clear screen
 		cout << '\n';
 	for (int i = 0; i < LENGTH + 2; i++){
 		for (int j = 0; j < WIDTH + 2; j++){
-			cout << map[i][j];
+			if (map[i][j] == 0)
+				cout << "·";
+			else if (map[i][j] == -2)
+				cout << "■";
+			else if (map[i][j] == 1000)
+				cout << "0";
+			else
+				cout << "□";
 		}
 		cout << '\n';
 	
 	//it may be worth looking into the library pdcurses/ncurses to make the game run better
 	}
 	cout << playerDirection;
+	cout << playerLength;
 }
 }
 
