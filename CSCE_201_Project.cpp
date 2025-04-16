@@ -310,7 +310,7 @@ void playGame(float speed) {
 		if ((!scoreFile.fail()) && (life == false)) {
 			scoreFile << playerLength << endl;
 		}
-		else
+		else if((scoreFile.fail()) && (life == false))
 			cout << "Error: could not open score file";
 	}
 }
