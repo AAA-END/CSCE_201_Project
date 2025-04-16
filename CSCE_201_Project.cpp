@@ -129,6 +129,7 @@ void playGame(float speed) {
 				map[i][j] = -2;
 		}
 
+
 	//set position of head
 	map[5][5] = 1;
 
@@ -296,6 +297,7 @@ void playGame(float speed) {
 					cout << "0";
 				else
 					cout << "□";
+
 			}
 			cout << '\n'; //THESE ASCII DON'T WORK ON THE WINDOWS COMMAND LINE, FIND COOLER ONES!!
 
