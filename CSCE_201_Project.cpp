@@ -1,6 +1,6 @@
 ﻿#include <iostream>
-#include <string>
-#include <cstdlib> //for rand() 
+#include <string> // used for getline()
+#include <cstdlib> //for rand() and atoi()
 #include <chrono> // for time
 #include <conio.h> //input handling
 #include <fstream> //scoreboard management
@@ -290,13 +290,13 @@ void playGame(float speed) {
 		for (int i = 0; i < LENGTH + 2; i++) {
 			for (int j = 0; j < WIDTH + 2; j++) {
 				if (map[i][j] == 0)
-					cout << "·";
+					cout << ",";
 				else if (map[i][j] == -2)
-					cout << "■";
+					cout << "A";
 				else if (map[i][j] == 1000)
-					cout << "0";
+					cout << "F";
 				else
-					cout << "□";
+					cout << "0";
 
 			}
 			cout << '\n'; //THESE ASCII DON'T WORK ON THE WINDOWS COMMAND LINE, FIND COOLER ONES!!
@@ -309,8 +309,10 @@ void playGame(float speed) {
 		ofstream scoreFile;
 		scoreFile.open("Scores.txt", ios::app);
 
+		// adds score to score file at end of game
 		if ((!scoreFile.fail()) && (life == false)) {
-			scoreFile << playerLength << endl;
+			scoreFile << playerLength << endl; 
+			scoreFile.close();
 		}
 		else if((scoreFile.fail()) && (life == false))
 			cout << "Error: could not open score file";
@@ -319,7 +321,7 @@ void playGame(float speed) {
 
 int setSpeed() {
 	cout << "Input a speed between 1 (fastest) and 40 (slowest).\n";
-	int speed_num = 50;
+	int speed_num = 50; // initialized out of range to force loop
 
 	while ((speed_num > 40) || (speed_num < 1)) {
 		cout << "Enter your speed value (default = 20): ";
@@ -341,7 +343,7 @@ void trackScores() {
 
 	cout << "Score history: \n-------------------------------------------\n";
 
-	if (!scoreFile.fail()) {
+	if (!scoreFile.fail()) { //reads for score file line by line
 		while (true) {
 			string line;
 			getline(scoreFile, line);
